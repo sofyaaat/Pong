@@ -1,31 +1,115 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.9.34607.119
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Pong", "Pong\Pong.vcxproj", "{400B012D-99CB-4B30-BACF-83213679E216}"
-EndProject
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|x64 = Debug|x64
-		Debug|x86 = Debug|x86
-		Release|x64 = Release|x64
-		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{400B012D-99CB-4B30-BACF-83213679E216}.Debug|x64.ActiveCfg = Debug|x64
-		{400B012D-99CB-4B30-BACF-83213679E216}.Debug|x64.Build.0 = Debug|x64
-		{400B012D-99CB-4B30-BACF-83213679E216}.Debug|x86.ActiveCfg = Debug|Win32
-		{400B012D-99CB-4B30-BACF-83213679E216}.Debug|x86.Build.0 = Debug|Win32
-		{400B012D-99CB-4B30-BACF-83213679E216}.Release|x64.ActiveCfg = Release|x64
-		{400B012D-99CB-4B30-BACF-83213679E216}.Release|x64.Build.0 = Release|x64
-		{400B012D-99CB-4B30-BACF-83213679E216}.Release|x86.ActiveCfg = Release|Win32
-		{400B012D-99CB-4B30-BACF-83213679E216}.Release|x86.Build.0 = Release|Win32
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {D7A9378E-3817-4ECE-B9D8-0210C2D85795}
-	EndGlobalSection
-EndGlobal
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <conio.h>
+#include <windows.h>
+
+using namespace std;
+
+// Размеры игрового поля
+const int FIELD_WIDTH = 80;
+const int FIELD_HEIGHT = 25;
+
+// Координаты мяча
+int ballX = FIELD_WIDTH / 2;
+int ballY = FIELD_HEIGHT / 2;
+
+// Скорость мяча
+int ballSpeedX = 1;
+int ballSpeedY = 1;
+
+// Координаты ракеток
+int player1Y = FIELD_HEIGHT / 2;
+int player2Y = FIELD_HEIGHT / 2;
+
+// Счет игроков
+int player1Score = 0;
+int player2Score = 0;
+
+// Функция для отрисовки игрового поля
+void drawField() {
+    system("cls");
+    for (int y = 0; y < FIELD_HEIGHT; y++) {
+        for (int x = 0; x < FIELD_WIDTH; x++) {
+            if (x == 0 || x == FIELD_WIDTH - 1 || y == 0 || y == FIELD_HEIGHT - 1) {
+                cout << "#";
+            } else if (y == player1Y || y == player1Y + 1 || y == player1Y - 1) {
+                cout << "I";
+            } else if (y == player2Y || y == player2Y + 1 || y == player2Y - 1) {
+                cout << "K";
+            } else if (x == ballX && y == ballY) {
+                cout << "O";
+            } else {
+                cout << " ";
+            }
+        }
+        cout << endl;
+    }
+    cout << "Player 1 score: " << player1Score << "   Player 2 score: " << player2Score << endl;
+}
+
+int main() {
+    srand(time(NULL));
+    
+    while (true) {
+        drawField();
+        
+        // Обработка ввода игроков
+        if (_kbhit()) {
+            char key = _getch();
+            if (key == 'w') {
+                player1Y--;
+            } else if (key == 's') {
+                player1Y++;
+            } else if (key == 'i') {
+                player2Y--;
+            } else if (key == 'k') {
+                player2Y++;
+            }
+        }
+        
+        // Движение мяча
+        ballX += ballSpeedX;
+        ballY += ballSpeedY;
+        
+        // Отражение мяча от стен
+        if (ballY == 1 || ballY == FIELD_HEIGHT - 2) {
+            ballSpeedY *= -1;
+        }
+        
+        // Отражение мяча от ракеток
+        if ((ballX == 2 && (ballY >= player1Y - 1 && ballY <= player1Y + 1)) ||
+            (ballX == FIELD_WIDTH - 3 && (ballY >= player2Y - 1 && ballY <= player2Y + 1))) {
+            ballSpeedX *= -1;
+        }
+        
+        // Подсчет очков
+        if (ballX == 1) {
+            player2Score++;
+            ballX = FIELD_WIDTH / 2;
+            ballY = FIELD_HEIGHT / 2;
+        } else if (ballX == FIELD_WIDTH - 2) {
+            player1Score++;
+            ballX = FIELD_WIDTH / 2;
+            ballY = FIELD_HEIGHT / 2;
+        }
+        
+        // Условие победы
+        if (player1Score == 7 || player2Score == 7) {
+            drawField();
+            cout << "Player " << (player1Score == 7 ? "1" : "2") << " wins!" << endl;
+            cout << "Play again? (y/n) ";
+            char choice;
+            cin >> choice;
+            if (choice != 'y') {
+                break;
+            }
+            player1Score = 0;
+            player2Score = 0;
+        }
+        
+        Sleep(50);
+    }
+    
+    return 0;
+}
