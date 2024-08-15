@@ -33,83 +33,92 @@ void drawField() {
         for (int x = 0; x < FIELD_WIDTH; x++) {
             if (x == 0 || x == FIELD_WIDTH - 1 || y == 0 || y == FIELD_HEIGHT - 1) {
                 cout << "#";
-            } else if (y == player1Y || y == player1Y + 1 || y == player1Y - 1) {
+            }
+            else if (y == player1Y || y == player1Y + 1 || y == player1Y - 1) {
                 cout << "I";
-            } else if (y == player2Y || y == player2Y + 1 || y == player2Y - 1) {
+            }
+            else if (y == player2Y || y == player2Y + 1 || y == player2Y - 1) {
                 cout << "K";
-            } else if (x == ballX && y == ballY) {
+            }
+            else if (x == ballX && y == ballY) {
                 cout << "O";
-            } else {
+            }
+            else {
                 cout << " ";
             }
         }
         cout << endl;
     }
-    cout << "Player 1 score: " << player1Score << "   Player 2 score: " << player2Score << endl;
+    cout << "Счет 1-ого игрока: " << player1Score << "   Счет 2-ого игрока: " << player2Score << endl;
 }
 
 int main() {
+    setlocale(0, "");
     srand(time(NULL));
-    
+
     while (true) {
         drawField();
-        
+
         // Обработка ввода игроков
         if (_kbhit()) {
             char key = _getch();
             if (key == 'w') {
                 player1Y--;
-            } else if (key == 's') {
+            }
+            else if (key == 's') {
                 player1Y++;
-            } else if (key == 'i') {
+            }
+            else if (key == 'i') {
                 player2Y--;
-            } else if (key == 'k') {
+            }
+            else if (key == 'k') {
                 player2Y++;
             }
         }
-        
+
         // Движение мяча
         ballX += ballSpeedX;
         ballY += ballSpeedY;
-        
+
         // Отражение мяча от стен
         if (ballY == 1 || ballY == FIELD_HEIGHT - 2) {
             ballSpeedY *= -1;
         }
-        
+
         // Отражение мяча от ракеток
         if ((ballX == 2 && (ballY >= player1Y - 1 && ballY <= player1Y + 1)) ||
             (ballX == FIELD_WIDTH - 3 && (ballY >= player2Y - 1 && ballY <= player2Y + 1))) {
             ballSpeedX *= -1;
         }
-        
+
         // Подсчет очков
         if (ballX == 1) {
             player2Score++;
             ballX = FIELD_WIDTH / 2;
             ballY = FIELD_HEIGHT / 2;
-        } else if (ballX == FIELD_WIDTH - 2) {
+        }
+        else if (ballX == FIELD_WIDTH - 2) {
             player1Score++;
             ballX = FIELD_WIDTH / 2;
             ballY = FIELD_HEIGHT / 2;
         }
-        
+
         // Условие победы
         if (player1Score == 7 || player2Score == 7) {
             drawField();
-            cout << "Player " << (player1Score == 7 ? "1" : "2") << " wins!" << endl;
-            cout << "Play again? (y/n) ";
+            cout << "Игрок " << (player1Score == 7 ? "1" : "2") << " побеждает!" << endl;
+            cout << "Еще раз? (да/нет) ";
             char choice;
             cin >> choice;
-            if (choice != 'y') {
+            if (choice != 'да') {
                 break;
             }
             player1Score = 0;
             player2Score = 0;
         }
-        
+
         Sleep(50);
     }
-    
+
     return 0;
 }
